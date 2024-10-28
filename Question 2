@@ -1,0 +1,83 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
+
+# 1. Load the Wine Dataset
+wine = load_wine()
+X = wine.data  # Feature matrix with 13 features
+y = wine.target  # Target vector with class labels (3 classes)
+
+# 2. Split the Data (70% training, 30% testing)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Standardize the data
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# 3. Train an LDA Model
+lda = LinearDiscriminantAnalysis()
+lda.fit(X_train, y_train)
+
+# 4. Evaluate the LDA Model
+y_pred_lda = lda.predict(X_test)
+accuracy_lda = accuracy_score(y_test, y_pred_lda)
+precision_lda = precision_score(y_test, y_pred_lda, average="weighted")
+recall_lda = recall_score(y_test, y_pred_lda, average="weighted")
+conf_matrix_lda = confusion_matrix(y_test, y_pred_lda)
+
+print("LDA Model Performance:")
+print(f"Accuracy: {accuracy_lda:.2f}")
+print(f"Precision: {precision_lda:.2f}")
+print(f"Recall: {recall_lda:.2f}")
+print("Confusion Matrix:")
+print(conf_matrix_lda)
+
+# 5. Compare with Logistic Regression
+log_reg = LogisticRegression(max_iter=10000, random_state=42)
+log_reg.fit(X_train, y_train)
+y_pred_log_reg = log_reg.predict(X_test)
+accuracy_log_reg = accuracy_score(y_test, y_pred_log_reg)
+precision_log_reg = precision_score(y_test, y_pred_log_reg, average="weighted")
+recall_log_reg = recall_score(y_test, y_pred_log_reg, average="weighted")
+conf_matrix_log_reg = confusion_matrix(y_test, y_pred_log_reg)
+
+print("\nLogistic Regression Model Performance:")
+print(f"Accuracy: {accuracy_log_reg:.2f}")
+print(f"Precision: {precision_log_reg:.2f}")
+print(f"Recall: {recall_log_reg:.2f}")
+print("Confusion Matrix:")
+print(conf_matrix_log_reg)
+
+# 6. Visualize Decision Boundaries (Optional)
+# Reduce to 2 dimensions using LDA for visualization
+lda_2d = LinearDiscriminantAnalysis(n_components=2)
+X_train_2d = lda_2d.fit_transform(X_train, y_train)
+X_test_2d = lda_2d.transform(X_test)
+
+plt.figure(figsize=(12, 6))
+
+# LDA Decision Boundary
+plt.subplot(1, 2, 1)
+plt.scatter(X_test_2d[:, 0], X_test_2d[:, 1], c=y_test, edgecolor='k', cmap='viridis', marker='o', label="Test Data")
+plt.title("LDA: 2D Projection and Decision Boundary")
+plt.xlabel("LDA Component 1")
+plt.ylabel("LDA Component 2")
+
+# Logistic Regression Decision Boundary
+plt.subplot(1, 2, 2)
+plt.scatter(X_test_2d[:, 0], X_test_2d[:, 1], c=y_test, edgecolor='k', cmap='viridis', marker='o', label="Test Data")
+plt.title("Logistic Regression: 2D Projection")
+plt.xlabel("LDA Component 1")
+plt.ylabel("LDA Component 2")
+
+plt.tight_layout()
+plt.show()
+
+
