@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# 1. Load the Iris dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+target_names = iris.target_names
+
+# 2. Data Standardization
+scaler = StandardScaler()
+X_standardized = scaler.fit_transform(X)
+
+# 3. Apply LDA
+lda = LinearDiscriminantAnalysis(n_components=2)
+X_lda = lda.fit_transform(X_standardized, y)
+
+# 4. Visualization of LDA
+plt.figure(figsize=(12, 5))
+
+# Scatter plot for LDA
+plt.subplot(1, 2, 1)
+for i, target_name in zip([0, 1, 2], target_names):
+    plt.scatter(X_lda[y == i, 0], X_lda[y == i, 1], label=target_name)
+plt.title("LDA: 2D projection")
+plt.xlabel("LDA Component 1")
+plt.ylabel("LDA Component 2")
+plt.legend()
+
+# 5. Apply PCA and plot for comparison
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_standardized)
+
+# Scatter plot for PCA
+plt.subplot(1, 2, 2)
+for i, target_name in zip([0, 1, 2], target_names):
+    plt.scatter(X_pca[y == i, 0], X_pca[y == i, 1], label=target_name)
+plt.title("PCA: 2D projection")
+plt.xlabel("PCA Component 1")
+plt.ylabel("PCA Component 2")
+plt.legend()
+
+plt.tight_layout()
+plt.show()
